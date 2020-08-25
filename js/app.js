@@ -58,20 +58,28 @@ Items.prototype.filterData = function () {
 // Filter the images
 
 $("#filter").change(function () {
-  $("section").hide();
+  // $("section").hide();
+  filterArr=[];
+  $("section").remove();
+  $("main").append(`<section id="photo-template">
+    <h2></h2>
+    <img />
+    <p></p>
+  </section>`);
   let selectValue = $(this).val();
   allItems.forEach((item)=>{
     if (item.keyword === selectValue){
       filterArr.push(item);
+      item.render();
     }
   })
   $(`.${selectValue}`).show();
   if (selectValue === "default") {
     allItems.forEach((item) => {
-      $("section").show();
-      $("#photo-template").hide();
+      item.render();
     });
   }
+  $('#photo-template').hide();
 });
 
 // Sorting the Data by number of by name
@@ -86,30 +94,48 @@ $("#sorting").change(function () {
   let value = $(this).val();
   //   Sort By Numbers of horns
   if (value === "horns") {
-    sortedArray = [...allItems.sort((a, b) => a.horns - b.horns)];
-    sortedArray.forEach((item) => {
-      item.render();
-    });
+    if(filterArr.length === 0){
+      sortedArray = [...allItems.sort((a, b) => a.horns - b.horns)];
+    
+    }else{
+      sortedArray = [...filterArr.sort((a, b) => a.horns - b.horns)];
+    }
+   
     // sort by title
   } else if (value === "title") {
-    sortedArray = [
-      ...allItems.sort((a, b) => {
-        var nameA = a.title.toUpperCase();
-        var nameB = b.title.toUpperCase();
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      }),
-    ];
-    sortedArray.forEach((item) => {
-      item.render();
-    });
-    // Default
+    if (filterArr.length === 0) {
+      sortedArray = [
+        ...allItems.sort((a, b) => {
+          var nameA = a.title.toUpperCase();
+          var nameB = b.title.toUpperCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          return 0;
+        }),
+      ];
+    }else{
+      sortedArray = [
+        ...filterArr.sort((a, b) => {
+          var nameA = a.title.toUpperCase();
+          var nameB = b.title.toUpperCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          return 0;
+        }),
+      ];
+    }
   }
+  sortedArray.forEach((item) => {
+    item.render();
+  });
   $("#photo-template").hide();
 });
 
@@ -136,17 +162,26 @@ $('body').click(function(){
     }
 })
 $("input:text").on("keyup", function () {
-    $("section").remove();
-    $("main").append(`<section id="photo-template">
-      <h2></h2>
-      <img />
-      <p></p>
-    </section>`);
-    let value = $(this).val();
-    allItems.forEach((item) => {
-      if (item.keyword.indexOf(value) !== -1) {
-        item.render();
-      }
-    });
-    $("#photo-template").hide();
-  });
+  $("section").remove();
+  $("main").append(`<section id="photo-template">
+    <h2></h2>
+    <img />
+    <p></p>
+  </section>`);
+  let value = $(this).val();
+  if(filterArr.length > 0){
+      filterArr.forEach((item) => {
+          if (item.keyword.indexOf(value) !== -1) {
+            item.render();
+          }
+        });
+  }else{
+      allItems.forEach((item) => {
+          if (item.keyword.indexOf(value) !== -1) {
+            item.render();
+          }
+        });
+  }
+ 
+  $("#photo-template").hide();
+});
