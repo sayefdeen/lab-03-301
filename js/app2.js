@@ -130,3 +130,18 @@ $('body').click(function(){
        
     }
 })
+$("input:text").on("keyup", function () {
+    $("section").remove();
+    $("main").append(`<section id="photo-template">
+      <h2></h2>
+      <img />
+      <p></p>
+    </section>`);
+    let value = $(this).val();
+    allItems.forEach((item) => {
+      if (item.keyword.indexOf(value) !== -1) {
+        item.render();
+      }
+    });
+    $("#photo-template").hide();
+  });

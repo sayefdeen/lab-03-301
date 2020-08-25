@@ -94,3 +94,8 @@ main {
   text-decoration: none;
   cursor: pointer;
 }
+#search {
+  float: right;
+  margin-right: 15px;
+  padding: 10px;
+}

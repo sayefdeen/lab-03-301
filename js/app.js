@@ -2,7 +2,7 @@
 
 let allItems = [];
 let keyArr = [];
-
+let filterArr=[];
 // Constructor
 function Items(image_url, title, desc, horns, keyword) {
   this.image_url = image_url;
@@ -60,6 +60,11 @@ Items.prototype.filterData = function () {
 $("#filter").change(function () {
   $("section").hide();
   let selectValue = $(this).val();
+  allItems.forEach((item)=>{
+    if (item.keyword === selectValue){
+      filterArr.push(item);
+    }
+  })
   $(`.${selectValue}`).show();
   if (selectValue === "default") {
     allItems.forEach((item) => {
@@ -114,3 +119,34 @@ $("#pageOne").click(function(){
 $("#pageTwo").click(function(){
   window.open('page2.html','__self')
 })
+$('body').click(function(){
+    let targets=event.target.localName
+    console.log('before if'+targets)
+    if(targets === 'img'){
+        console.log('after if'+  event.target.parentNode)
+        event.target.parentNode.classList.toggle('modal')
+        // let perant= event.target.parentNode
+        $('.modal').prepend('<span class="close">&times;</span>')
+        $('.close').click(function(){
+            console.log( event.target)
+            event.target.parentNode.classList.toggle('modal')
+            $('.close'). remove() 
+        })
+       
+    }
+})
+$("input:text").on("keyup", function () {
+    $("section").remove();
+    $("main").append(`<section id="photo-template">
+      <h2></h2>
+      <img />
+      <p></p>
+    </section>`);
+    let value = $(this).val();
+    allItems.forEach((item) => {
+      if (item.keyword.indexOf(value) !== -1) {
+        item.render();
+      }
+    });
+    $("#photo-template").hide();
+  });

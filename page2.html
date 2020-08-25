@@ -9,11 +9,9 @@
   <link rel="stylesheet" href="css/layout.css" />
   <script id="mustach" type="text/x-tmpl-mustache">
     <section id="photo-template" class={{keyword}}>
-       
       <h2>{{title}}</h2>
       <img src='{{image_url}}'/>
       <p>{{desc}}</p>
-     
     </section>
     </script>
 </head>
@@ -29,6 +27,7 @@
       <option selected disabled value="default">Sort by Horns/Name</option>
       <option value="horns">Number Of Horns</option>
       <option value="title">Name Of the picture</option>
+      <input id="search" type="text" placeholder="Search" />
     </select>
     <button id="pageOne">Page one</button>
     <button id="pageTwo">Page Two</button>
