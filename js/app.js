@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 let allItems = [];
 let keyArr = [];
-let filterArr=[];
+let filterArr = [];
 // Constructor
 function Items(image_url, title, desc, horns, keyword) {
   this.image_url = image_url;
@@ -14,28 +14,32 @@ function Items(image_url, title, desc, horns, keyword) {
 }
 
 // Get data from data folder
-
-$.ajax("./data/page-1.json").then((data) => {
-  data.forEach((item) => {
-    let newItem = new Items(
-      item.image_url,
-      item.title,
-      item.description,
-      item.horns,
-      item.keyword
-    );
-    newItem.render();
-    newItem.filterData();
+getData();
+function getData(id = 1) {
+  keyArr = [];
+  allItems = [];
+  $.ajax(`./data/page-${id}.json`).then((data) => {
+    data.forEach((item) => {
+      let newItem = new Items(
+        item.image_url,
+        item.title,
+        item.description,
+        item.horns,
+        item.keyword
+      );
+      newItem.render();
+      newItem.filterData();
+    });
+    $('#photo-template').hide();
   });
-  $("#photo-template").hide();
-});
+}
 
 // Render function
 
 Items.prototype.render = function () {
-  let imageSection = $("#mustach").html();
-  let html=Mustache.render(imageSection,this);
-  $('main').append(html)
+  let imageSection = $('#mustach').html();
+  let html = Mustache.render(imageSection, this);
+  $('main').append(html);
   // imageSection.removeAttr("id");
   // imageSection.addClass(this.keyword);
   // imageSection.find("img").attr("src", this.image_url);
@@ -46,8 +50,10 @@ Items.prototype.render = function () {
 
 Items.prototype.filterData = function () {
   if (!keyArr.includes(this.keyword)) {
-    $("#filter").append(
-      `<option value="${this.keyword}">${this.keyword.toUpperCase()}</option>`
+    $('#filter').append(
+      `<option class="key" value="${
+        this.keyword
+      }">${this.keyword.toUpperCase()}</option>`
     );
     keyArr.push(this.keyword);
   }
@@ -57,24 +63,24 @@ Items.prototype.filterData = function () {
 
 // Filter the images
 
-$("#filter").change(function () {
+$('#filter').change(function () {
   // $("section").hide();
-  filterArr=[];
-  $("section").remove();
-  $("main").append(`<section id="photo-template">
+  filterArr = [];
+  $('section').remove();
+  $('main').append(`<section id="photo-template">
     <h2></h2>
     <img />
     <p></p>
   </section>`);
   let selectValue = $(this).val();
-  allItems.forEach((item)=>{
-    if (item.keyword === selectValue){
+  allItems.forEach((item) => {
+    if (item.keyword === selectValue) {
       filterArr.push(item);
       item.render();
     }
-  })
+  });
   $(`.${selectValue}`).show();
-  if (selectValue === "default") {
+  if (selectValue === 'default') {
     allItems.forEach((item) => {
       item.render();
     });
@@ -83,9 +89,9 @@ $("#filter").change(function () {
 });
 
 // Sorting the Data by number of by name
-$("#sorting").change(function () {
-  $("section").remove();
-  $("main").append(`<section id="photo-template">
+$('#sorting').change(function () {
+  $('section').remove();
+  $('main').append(`<section id="photo-template">
     <h2></h2>
     <img />
     <p></p>
@@ -93,16 +99,15 @@ $("#sorting").change(function () {
   let sortedArray = [];
   let value = $(this).val();
   //   Sort By Numbers of horns
-  if (value === "horns") {
-    if(filterArr.length === 0){
+  if (value === 'horns') {
+    if (filterArr.length === 0) {
       sortedArray = [...allItems.sort((a, b) => a.horns - b.horns)];
-    
-    }else{
+    } else {
       sortedArray = [...filterArr.sort((a, b) => a.horns - b.horns)];
     }
-   
+
     // sort by title
-  } else if (value === "title") {
+  } else if (value === 'title') {
     if (filterArr.length === 0) {
       sortedArray = [
         ...allItems.sort((a, b) => {
@@ -117,7 +122,7 @@ $("#sorting").change(function () {
           return 0;
         }),
       ];
-    }else{
+    } else {
       sortedArray = [
         ...filterArr.sort((a, b) => {
           var nameA = a.title.toUpperCase();
@@ -136,52 +141,68 @@ $("#sorting").change(function () {
   sortedArray.forEach((item) => {
     item.render();
   });
-  $("#photo-template").hide();
+  $('#photo-template').hide();
 });
 
-$("#pageOne").click(function(){
-  window.open('index.html','__self')
-})
-$("#pageTwo").click(function(){
-  window.open('page2.html','__self')
-})
-$('body').click(function(){
-    let targets=event.target.localName
-    console.log('before if'+targets)
-    if(targets === 'img'){
-        console.log('after if'+  event.target.parentNode)
-        event.target.parentNode.classList.toggle('modal')
-        // let perant= event.target.parentNode
-        $('.modal').prepend('<span class="close">&times;</span>')
-        $('.close').click(function(){
-            console.log( event.target)
-            event.target.parentNode.classList.toggle('modal')
-            $('.close'). remove() 
-        })
-       
-    }
-})
-$("input:text").on("keyup", function () {
-  $("section").remove();
-  $("main").append(`<section id="photo-template">
+// $('#pageOne').click(function () {
+//   window.open('index.html', '__self');
+// });
+// $('#pageTwo').click(function () {
+//   window.open('page2.html', '__self');
+// });
+
+// Change between data files
+
+$('button').click(function () {
+  // Empty all the screen to avoid repeating
+  $('section').remove();
+  $('main').append(`<section id="photo-template">
+    <h2></h2>
+    <img />
+    <p></p>
+  </section>`);
+  // Empty the keyWord filter options
+  $('.key').remove();
+  let pageId = $(this)[0].id.split('@')[1];
+  getData(pageId);
+});
+
+$('body').click(function () {
+  let targets = event.target.localName;
+  console.log('before if' + targets);
+  if (targets === 'img') {
+    console.log('after if' + event.target.parentNode);
+    event.target.parentNode.classList.toggle('modal');
+    // let perant= event.target.parentNode
+    $('.modal').prepend('<span class="close">&times;</span>');
+    $('.close').click(function () {
+      console.log(event.target);
+      event.target.parentNode.classList.toggle('modal');
+      $('.close').remove();
+    });
+  }
+});
+$('input:text').on('keyup', function () {
+  $('section').remove();
+  $('main').append(`<section id="photo-template">
     <h2></h2>
     <img />
     <p></p>
   </section>`);
   let value = $(this).val();
-  if(filterArr.length > 0){
-      filterArr.forEach((item) => {
-          if (item.keyword.indexOf(value) !== -1) {
-            item.render();
-          }
-        });
-  }else{
-      allItems.forEach((item) => {
-          if (item.keyword.indexOf(value) !== -1) {
-            item.render();
-          }
-        });
+  if (filterArr.length > 0) {
+    filterArr.forEach((item) => {
+      if (item.keyword.indexOf(value) !== -1) {
+        item.render();
+      }
+    });
+  } else {
+    allItems.forEach((item) => {
+      if (item.keyword.indexOf(value) !== -1) {
+        item.render();
+      }
+    });
   }
- 
-  $("#photo-template").hide();
+
+  $('#photo-template').hide();
 });
